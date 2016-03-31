@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "Nagfree",
+  "description": "Makes a few sites a little better",
+  "version": "0.1",
+  "permissions" : [ "tabs" ],
+  "web_accessible_resources" : ["lib/*.js", "scripts.json", "scripts/*.js"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "app.js"
+      ]
+    }
+  ]
+}
