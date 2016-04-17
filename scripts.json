@@ -1,5 +1,9 @@
 {
     "ask.metafilter.com" : "metafilter",
     "news.ycombinator.com" : "hackernews",
-    "funda.nl" : "funda"
+    "funda.nl" : "funda",
+    "ah.nl" : {
+        "script" : "ah",
+        "waitFor" : ".product-lane"
+    }
 }

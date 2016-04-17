@@ -5,18 +5,54 @@ function loadScript(src, cb = function(){}) {
     document.head.appendChild(script);
 }
 
+function loadPath(path) {
+    if ('jQuery' in window) {
+        loadScript(path);
+    } else {
+        loadScript('lib/jquery.js', () => loadScript(path));
+    }
+}
+
+function waitForSelector(selector) {
+    var times = 5;
+
+    return new Promise(function(resolve, reject) {
+        function check() {
+            if (!!document.querySelector(selector)) {
+                resolve();
+            } else {
+                times--;
+
+                if (times > 0) {
+                    setTimeout(check, 300);
+                }
+            }
+        }
+
+        check();
+    });
+}
+
 function main(sites) {
     var url = new URL(window.location);
     var hostname = url.hostname.replace('www.', '');
 
     if (!sites[hostname]) return;
 
-    var path = `scripts/${sites[hostname]}.js`;
-
-    if ('jQuery' in window) {
-        loadScript(path);
+    if (typeof sites[hostname] === 'string') {
+        var siteId = sites[hostname];
+        var waitFor = false;
     } else {
-        loadScript('lib/jquery.js', () => loadScript(path));
+        var siteId = sites[hostname].script;
+        var waitFor = sites[hostname].waitFor;
+    }
+
+    var path = `scripts/${siteId}.js`;
+
+    if (waitFor) {
+        waitForSelector(waitFor).then(() => { loadPath(path); });
+    } else {
+        loadPath(path);
     }
 }
 
