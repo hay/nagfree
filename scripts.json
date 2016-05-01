@@ -1,12 +1,7 @@
 {
     "ask.metafilter.com" : "metafilter",
     "news.ycombinator.com" : "hackernews",
-    "funda.nl" : {
-        "script" : "funda",
-        "runWhen" : ".search-output"
-    },
-    "ah.nl" : {
-        "script" : "ah",
-        "waitFor" : ".product-lane"
-    }
+    "twitter.com" : "twitter",
+    "funda.nl" : "funda",
+    "ah.nl" : "ah"
 }

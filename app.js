@@ -1,92 +1,55 @@
-function loadScript(src, cb = function(){}) {
-    var script = document.createElement('script');
-    script.src = chrome.extension.getURL(src);
-    script.addEventListener('load', cb);
-    document.head.appendChild(script);
-}
-
-function loadPath(path) {
-    if ('jQuery' in window) {
-        loadScript(path);
-    } else {
-        loadScript('lib/jquery.js', () => loadScript(path));
-    }
-}
-
-function onDomChange(selector, cb) {
-    var el = document.querySelector(selector);
-
-    console.log(el);
-
-    var observer = new MutationObserver((mut, obs) => {
-        console.log(mut);
-        if (mut[0].addedNodes.length || mut[0].removedNodes.length) {
-            cb();
-        }
-    });
-
-    observer.observe(el, {
-        childList : true,
-        subtree : true
-    });
-}
-
-function waitForSelector(selector) {
-    var times = 5;
-
-    return new Promise(function(resolve, reject) {
-        function check() {
-            if (!!document.querySelector(selector)) {
-                resolve();
-            } else {
-                times--;
-
-                if (times > 0) {
-                    setTimeout(check, 300);
-                }
-            }
+const DEBUG = window.location.href.indexOf('debug') !== -1;
+const log = function(msg) {
+    if (DEBUG) {
+        if (typeof msg === 'object') {
+            msg = JSON.stringify(msg, null, 4);
         }
 
-        check();
-    });
+        console.log(`[nagfree] ${msg}`);
+    }
 }
 
-function parseConf(inputConf) {
-    var conf = {
-        waitFor : false,
-        runWhen : false
-    };
+// Why doesn't Promise have this natively?
+Promise.series = function(series) {
+    return series.reduce((p, fn) => p.then(fn), Promise.resolve());
+};
 
-    if (typeof inputConf === 'string') {
-        conf.siteId = inputConf;
-        return conf;
-    }
-
-    for (var key in inputConf) {
-        conf[key] = inputConf[key];
-    }
-
-    return conf;
+function loadScript(src) {
+    return new Promise( (resolve) => {
+        log(`Now loading ${src}`);
+        var script = document.createElement('script');
+        script.src = chrome.extension.getURL(src);
+        script.addEventListener('load', resolve);
+        document.head.appendChild(script);
+    });
 }
 
 function main(sites) {
+    log('Loaded sites');
+    log(sites);
+
     var url = new URL(window.location);
     var hostname = url.hostname.replace('www.', '');
 
-    if (!sites[hostname]) return;
+    log(`Checking hostname ${hostname}`);
 
-    var siteconf = parseConf(sites[hostname]);
-    var path = `scripts/${siteconf.siteId}.js`;
-
-    if (siteconf.waitFor) {
-        waitForSelector(siteconf.waitFor).then(() => { loadPath(path); });
-    } else {
-        loadPath(path);
+    if (!sites[hostname]) {
+        log('No filters found');
+        return;
     }
 
-    if (siteconf.runWhen) {
-        onDomChange(siteconf.runWhen, window.__nagfree_script__());
+    var path = `scripts/${sites[hostname]}.js`;
+    log(`Script: ${path}`);
+
+    var scripts = [];
+
+    if (!('jQuery' in window)) {
+        scripts.push(loadScript('lib/jquery.js'));
     }
+
+    scripts.push(loadScript('nagfree.js'), loadScript(path));
+
+    Promise.series(scripts).then(() => log('All promises'));
 }
 
 fetch(chrome.extension.getURL('scripts.json')).then((res) => res.json()).then(main);

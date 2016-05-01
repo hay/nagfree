@@ -1,4 +1,6 @@
-window.__nagfree_script__ = (() => {
+(() => {
+console.log('nagfree', window.nagfree);
+var $ = jQuery;
 var $list = $(".object-kenmerken");
 var $price = $(".object-header-price");
 var $search = $(".search-result-content");
@@ -32,4 +34,13 @@ function search() {
 
 if ($price.length) page();
 if ($search.length) search();
+
+nagfree.onDomChange('.search-output', function() {
+    nagfree.waitForSelector('.search-result-content').then(() => {
+        $search = $(".search-result-content");
+        console.log($search.length);
+        search();
+    });
+});
+
 })();

@@ -1,4 +1,3 @@
-window.__nagfree_script__ = (() => {
 const $product = $(".product-lane");
 
 function addPricePerKg() {
@@ -14,4 +13,3 @@ function addPricePerKg() {
 if ($product.length) {
     $product.find(".product-cardview").each(addPricePerKg);
 }
-})();

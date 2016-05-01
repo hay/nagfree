@@ -4,7 +4,7 @@
   "description": "Makes a few sites a little better",
   "version": "0.1",
   "permissions" : [ "tabs" ],
-  "web_accessible_resources" : ["lib/*.js", "scripts.json", "scripts/*.js"],
+  "web_accessible_resources" : ["*.js", "lib/*.js", "scripts.json", "scripts/*.js"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
