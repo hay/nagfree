@@ -1,4 +1,4 @@
-(() => {
+window.__nagfree_script__ = (() => {
 // Only show on threads
 if (!$("body").is(".thread")) return;
 

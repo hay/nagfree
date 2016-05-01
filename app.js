@@ -13,6 +13,24 @@ function loadPath(path) {
     }
 }
 
+function onDomChange(selector, cb) {
+    var el = document.querySelector(selector);
+
+    console.log(el);
+
+    var observer = new MutationObserver((mut, obs) => {
+        console.log(mut);
+        if (mut[0].addedNodes.length || mut[0].removedNodes.length) {
+            cb();
+        }
+    });
+
+    observer.observe(el, {
+        childList : true,
+        subtree : true
+    });
+}
+
 function waitForSelector(selector) {
     var times = 5;
 
@@ -33,26 +51,41 @@ function waitForSelector(selector) {
     });
 }
 
+function parseConf(inputConf) {
+    var conf = {
+        waitFor : false,
+        runWhen : false
+    };
+
+    if (typeof inputConf === 'string') {
+        conf.siteId = inputConf;
+        return conf;
+    }
+
+    for (var key in inputConf) {
+        conf[key] = inputConf[key];
+    }
+
+    return conf;
+}
+
 function main(sites) {
     var url = new URL(window.location);
     var hostname = url.hostname.replace('www.', '');
 
     if (!sites[hostname]) return;
 
-    if (typeof sites[hostname] === 'string') {
-        var siteId = sites[hostname];
-        var waitFor = false;
-    } else {
-        var siteId = sites[hostname].script;
-        var waitFor = sites[hostname].waitFor;
-    }
+    var siteconf = parseConf(sites[hostname]);
+    var path = `scripts/${siteconf.siteId}.js`;
 
-    var path = `scripts/${siteId}.js`;
-
-    if (waitFor) {
-        waitForSelector(waitFor).then(() => { loadPath(path); });
+    if (siteconf.waitFor) {
+        waitForSelector(siteconf.waitFor).then(() => { loadPath(path); });
     } else {
         loadPath(path);
+    }
+
+    if (siteconf.runWhen) {
+        onDomChange(siteconf.runWhen, window.__nagfree_script__());
     }
 }
 

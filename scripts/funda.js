@@ -1,4 +1,4 @@
-(() => {
+window.__nagfree_script__ = (() => {
 var $list = $(".object-kenmerken");
 var $price = $(".object-header-price");
 var $search = $(".search-result-content");

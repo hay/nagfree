@@ -1,4 +1,4 @@
-(() => {
+window.__nagfree_script__ = (() => {
 const $product = $(".product-lane");
 
 function addPricePerKg() {
