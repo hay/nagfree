@@ -32,11 +32,3 @@ function search() {
 
 if ($price.length) page();
 if ($search.length) search();
-
-nagfree.onDomChange('.search-output', function() {
-    nagfree.waitForSelector('.search-result-content').then(() => {
-        $search = $(".search-result-content");
-        console.log($search.length);
-        search();
-    });
-});

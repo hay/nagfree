@@ -1,15 +1,22 @@
-const $product = $(".product-lane");
-
 function addPricePerKg() {
     const $el = $(this);
     const price = parseFloat($el.find(".product-price").text());
     const $weight = $el.find(".product-description__unit-size");
     const weightText = $weight.text();
-    const weight = parseInt(weightText.replace('g', '').trim());
-    const pricePerKg = ((price / weight) * 1000).toFixed(2);
+    const weightParts = weightText.split(' ');
+    const size = parseInt(weightParts[0]);
+    const unit = weightParts[1];
+    const weight = unit === 'kg' ? size : (size / 1000);
+    const pricePerKg = ((price / weight)).toFixed(2);
     $weight.text(`${weightText} | € ${pricePerKg} per kg`);
 }
 
-if ($product.length) {
-    $product.find(".product-cardview").each(addPricePerKg);
+function handleProductLane() {
+    const $product = $(".product-lane");
+
+    if ($product.length) {
+        $product.find(".product-cardview").each(addPricePerKg);
+    }
 }
+
+nagfree.waitForSelector('.product-lane .product-cardview .product-price').then(handleProductLane);

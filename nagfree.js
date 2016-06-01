@@ -4,8 +4,14 @@ window.nagfree = (() => {
     log('jQuery version: ', $.fn.jquery);
 
     function onDomChange(selector, callback) {
+        log(`Trying to register onDomChange handler for ${selector}`);
         var el = document.querySelector(selector);
-        log(`onDomChange for ${el}`);
+
+        if (!el) {
+            log(`${el} is not a domNode`);
+        }
+
+        log(`onDomChange registered for ${el}`);
 
         var observer = new MutationObserver((mut, obs) => {
             if (mut[0].addedNodes.length || mut[0].removedNodes.length) {
@@ -26,13 +32,19 @@ window.nagfree = (() => {
 
         return new Promise(function(resolve, reject) {
             function check() {
+                log(`checking for ${selector}`);
+
                 if (!!document.querySelector(selector)) {
+                    log(`found it!`);
                     resolve();
                 } else {
                     times--;
 
                     if (times > 0) {
+                        log(`checking ${times} more`);
                         setTimeout(check, 300);
+                    } else {
+                        log(`didn't find the selector :(`);
                     }
                 }
             }
