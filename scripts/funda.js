@@ -1,5 +1,3 @@
-(() => {
-console.log('nagfree', window.nagfree);
 var $ = jQuery;
 var $list = $(".object-kenmerken");
 var $price = $(".object-header-price");
@@ -42,5 +40,3 @@ nagfree.onDomChange('.search-output', function() {
         search();
     });
 });
-
-})();

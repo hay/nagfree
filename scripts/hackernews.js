@@ -1,4 +1,3 @@
-window.__nagfree_script__ = (() => {
 // Based on https://github.com/niyazpk/Collapsible-comments-for-Hacker-News
 var current_level_width = 0;
 var inner_level_width = 1000;
@@ -71,4 +70,3 @@ if (!$('body').hasClass('collapsible-comments')) {
     });
   });
 }
-})();

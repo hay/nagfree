@@ -1,21 +1,7 @@
-console.log('jQuery', window.jQuery);
-
-if (!('jQuery' in window)) {
-    throw new Error('[nagfree] jQuery could not be loaded...');
-}
-
 window.nagfree = (() => {
-    const DEBUG = window.location.href.indexOf('debug') !== -1;
-
-    function log(msg) {
-        if (DEBUG) {
-            if (typeof msg === 'object') {
-                msg = JSON.stringify(msg, null, 4);
-            }
-
-            console.log(`[nagfree] ${msg}`);
-        }
-    }
+    var log = console.log.bind(console);
+    log('nagfree active');
+    log('jQuery version: ', $.fn.jquery);
 
     function onDomChange(selector, callback) {
         var el = document.querySelector(selector);
@@ -55,5 +41,5 @@ window.nagfree = (() => {
         });
     }
 
-    return { onDomChange, waitForSelector, log };
+    return { onDomChange, waitForSelector };
 })();
