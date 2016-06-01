@@ -1,0 +1,8 @@
+{
+  "name": "nagfree",
+  "private": true,
+  "dependencies": {
+    "jquery": "^2.2.4",
+    "underscore": "^1.8.3"
+  }
+}

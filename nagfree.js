@@ -13,16 +13,18 @@ window.nagfree = (() => {
 
         log(`onDomChange registered for ${el}`);
 
-        var observer = new MutationObserver((mut, obs) => {
+        function handleMutation(mut, obs) {
             if (mut[0].addedNodes.length || mut[0].removedNodes.length) {
                 log('onDomChange: callback');
                 callback();
             }
-        });
+        };
+
+        var observer = new MutationObserver(_.debounce(handleMutation, 1000));
 
         observer.observe(el, {
             childList : true,
-            subtree : true
+            subtree : false
         });
     }
 

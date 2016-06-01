@@ -1,3 +1,5 @@
+const PRODUCT_LANE_SELECTOR = '.product-lane .product-cardview .product-price';
+
 function addPricePerKg() {
     const $el = $(this);
     const price = parseFloat($el.find(".product-price").text());
@@ -6,17 +8,29 @@ function addPricePerKg() {
     const weightParts = weightText.split(' ');
     const size = parseInt(weightParts[0]);
     const unit = weightParts[1];
+
+    if (['kg', 'g'].indexOf(unit) === -1) {
+        // No valid unit
+        return;
+    }
+
     const weight = unit === 'kg' ? size : (size / 1000);
     const pricePerKg = ((price / weight)).toFixed(2);
     $weight.text(`${weightText} | € ${pricePerKg} per kg`);
 }
 
-function handleProductLane() {
-    const $product = $(".product-lane");
+function addPricesToProductlanes() {
+    nagfree.waitForSelector(PRODUCT_LANE_SELECTOR).then(() => {
+        const $product = $(".product-lane");
 
-    if ($product.length) {
-        $product.find(".product-cardview").each(addPricePerKg);
-    }
+        if ($product.length) {
+            $product.find(".product-cardview").each(addPricePerKg);
+        }
+    });
 }
 
-nagfree.waitForSelector('.product-lane .product-cardview .product-price').then(handleProductLane);
+addPricesToProductlanes();
+
+nagfree.waitForSelector('.canvas-page').then(() => {
+    nagfree.onDomChange('.canvas-page', addPricesToProductlanes);
+});

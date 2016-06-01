@@ -35,7 +35,12 @@ function handleUpdate(tabId, changeInfo, tab) {
 
     log(`Found filter for ${tab.url}, now injecting`);
 
-    executeScripts(tabId, ['lib/jquery.js', 'nagfree.js', path]);
+    executeScripts(tabId, [
+        'lib/jquery/dist/jquery.js',
+        'lib/underscore/underscore-min.js',
+        'nagfree.js',
+        path
+    ]);
 }
 
 function main() {
