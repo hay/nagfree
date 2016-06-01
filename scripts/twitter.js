@@ -1,6 +1,15 @@
+const PROMOTED_SELECTOR = '.Icon--promoted';
+
 function removePromoted() {
-    var $promoted = $(".Icon--promoted");
-    console.log($promoted.length);
+    console.log('Removing promoted tweets');
+
+    $(PROMOTED_SELECTOR).each(function() {
+        $(this).parents(".stream-item").remove();
+    });
 }
 
-removePromoted();
+nagfree.waitForSelector(PROMOTED_SELECTOR).then(removePromoted);
+
+nagfree.onDomChange('.stream-items', () => {
+    nagfree.waitForSelector(PROMOTED_SELECTOR).then(removePromoted);
+});
