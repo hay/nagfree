@@ -1,6 +1,7 @@
 {
     "ask.metafilter.com" : "metafilter",
     "news.ycombinator.com" : "hackernews",
+    "flickr.com" : "flickr",
     "funda.nl" : "funda",
     "ah.nl" : "ah"
 }
