@@ -3,5 +3,6 @@
     "news.ycombinator.com" : "hackernews",
     "flickr.com" : "flickr",
     "funda.nl" : "funda",
-    "ah.nl" : "ah"
+    "ah.nl" : "ah",
+    "oddschecker.com" : "oddschecker"
 }
