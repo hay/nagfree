@@ -121,3 +121,8 @@ var tcoRemove = (function() {
 })();
 
 tcoRemove.init();
+
+// Remove the useless 'while you were away' box
+nagfree.waitForSelector(".has-recap", () => {
+    $(".has-recap").remove();
+})
