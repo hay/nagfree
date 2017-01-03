@@ -1,5 +1,6 @@
 window.nagfree = (() => {
     var log = console.log.bind(console);
+
     log('nagfree active');
     log('jQuery version: ', $.fn.jquery);
 
