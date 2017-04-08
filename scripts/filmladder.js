@@ -18,6 +18,12 @@ var style = `
         height: 240px;
         overflow: hidden;
     }
+
+    [collapse-times] {
+        cursor: pointer;
+        text-transform: uppercase;
+        text-decoration: underline;
+    }
 `;
 
 const $movies = $(".city-movie");
@@ -27,7 +33,7 @@ function collapse(index, el) {
     $el.addClass('collapsed');
 
     $el.on('click', '[collapse-times]', () => $el.toggleClass('collapsed'));
-    $el.find(".info h3").append('<button collapse-times>🕒</button>');
+    $el.find(".info h3").append('<span collapse-times>tijden</span>');
 }
 
 if ($movies.length) {
