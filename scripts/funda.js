@@ -25,7 +25,23 @@ function search() {
         var $s = $(this);
         var size = nr($s.find('[title="Woonoppervlakte"]').text());
         var price = nr($s.find('.search-result-price').text());
+        var rooms = nr($s.find('.search-result-kenmerken li:last-child').text());
+        var zip = nr($s.find(".search-result-subtitle").text());
+        var $street = $s.find(".search-result-title");
+        $street.find(".search-result-subtitle").remove();
+        var street = $street.text().trim().replace(/\n|\t| {2,}/g, '').trim();
+        var id = $s.find("a[data-search-result-item-anchor]").attr('data-search-result-item-anchor').trim();
+
+        console.log(`${id} - ${street} - size ${size} price ${price} rooms ${rooms} zip ${zip}`);
+
         $s.find('.search-result-info').eq(1).append(`<span>• ${getPricePerSqm(size, price)}</span>`);
+
+        // $.ajax({
+        //     type : "POST",
+        //     url : "http://localhost:5000/",
+        //     contentType : "application/json; charset=UTF-8",
+        //     data : JSON.stringify({ id, street, size, price, rooms, zip })
+        // });
     });
 }
 

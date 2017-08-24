@@ -1,14 +1,17 @@
 {
     "ah.nl" : "ah",
     "ask.metafilter.com" : "metafilter",
+    "beeldbank.amsterdam.nl" : "beeldbank",
     "commons.wikimedia.org" : "wmcommons",
     "facebook.com" : "facebook",
     "filmladder.nl" : "filmladder",
     "flickr.com" : "flickr",
     "funda.nl" : "funda",
     "instagram.com" : "instagram",
+    "nos.nl" : "npocookie",
     "oddschecker.com" : "oddschecker",
     "twitter.com" : "twitter",
+    "vara.nl" : "npocookie",
     "volkskrant.nl" : "volkskrant",
     "vpro.nl" : "npocookie"
 }
