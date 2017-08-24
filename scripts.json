@@ -1,13 +1,14 @@
 {
+    "ah.nl" : "ah",
     "ask.metafilter.com" : "metafilter",
+    "commons.wikimedia.org" : "wmcommons",
+    "facebook.com" : "facebook",
+    "filmladder.nl" : "filmladder",
     "flickr.com" : "flickr",
     "funda.nl" : "funda",
-    "facebook.com" : "facebook",
-    "ah.nl" : "ah",
     "instagram.com" : "instagram",
     "oddschecker.com" : "oddschecker",
-    "vpro.nl" : "npocookie",
-    "commons.wikimedia.org" : "wmcommons",
     "twitter.com" : "twitter",
-    "filmladder.nl" : "filmladder"
+    "volkskrant.nl" : "volkskrant",
+    "vpro.nl" : "npocookie"
 }
