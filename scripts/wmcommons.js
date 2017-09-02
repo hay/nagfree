@@ -1,4 +1,4 @@
-var style = `
+const style = `
     .searchResultImage td:nth-child(2),
     .mw-search-result-heading,
     .searchresult,
@@ -24,7 +24,7 @@ var style = `
         margin: 0 !important;
     }
 
-    .mw-gallery-traditional .gallerytext {
+    .mw-gallery-traditional .gallerybox[type="image"] .gallerytext {
         display: none;
     }
 
@@ -33,5 +33,8 @@ var style = `
         height: inherit !important;
     }
 `;
+
+// Make sure non-image files are still clickable
+$(".gallery .thumb img").parents(".gallerybox").attr('type', 'image');
 
 $("body").append(`<style>${style}</style>`);

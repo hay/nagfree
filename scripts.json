@@ -1,17 +1,18 @@
 {
+    "ah.nl" : "ah",
     "ask.metafilter.com" : "metafilter",
+    "beeldbank.amsterdam.nl" : "beeldbank",
+    "commons.wikimedia.org" : "wmcommons",
+    "facebook.com" : "facebook",
+    "filmladder.nl" : "filmladder",
     "flickr.com" : "flickr",
     "funda.nl" : "funda",
-    "facebook.com" : "facebook",
-    "ah.nl" : "ah",
+    "getrevue.co" : "revue",
     "instagram.com" : "instagram",
-    "oddschecker.com" : "oddschecker",
-    "vpro.nl" : "npocookie",
     "nos.nl" : "npocookie",
-    "vara.nl" : "npocookie",
-    "commons.wikimedia.org" : "wmcommons",
+    "oddschecker.com" : "oddschecker",
     "twitter.com" : "twitter",
-    "beeldbank.amsterdam.nl" : "beeldbank",
-    "filmladder.nl" : "filmladder",
-    "getrevue.co" : "revue"
+    "vara.nl" : "npocookie",
+    "volkskrant.nl" : "volkskrant",
+    "vpro.nl" : "npocookie"
 }

@@ -2,7 +2,6 @@ window.nagfree = (() => {
     var log = console.log.bind(console);
 
     log('nagfree active');
-    log('jQuery version: ', $.fn.jquery);
 
     function onDomChange(selector, callback) {
         log(`Trying to register onDomChange handler for ${selector}`);
