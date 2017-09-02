@@ -34,7 +34,22 @@ const style = `
     }
 `;
 
-// Make sure non-image files are still clickable
-$(".gallery .thumb img").parents(".gallerybox").attr('type', 'image');
+function toggleStyle() {
+    if ($("#nagfree-style").length) {
+        $("#nagfree-style").remove();
+    } else {
+        $("body").append(`<style id="nagfree-style">${style}</style>`)
+    }
+}
 
-$("body").append(`<style>${style}</style>`);
+function main() {
+    // Make sure non-image files are still clickable
+    $(".gallery .thumb img").parents(".gallerybox").attr('type', 'image');
+
+    const $btn = $(`<button style="float:right;">Toggle style</button>`);
+    $btn.on('click', toggleStyle);
+    $("#mw-category-media h2").append($btn);
+    toggleStyle();
+}
+
+main();

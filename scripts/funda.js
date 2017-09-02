@@ -35,13 +35,6 @@ function search() {
         console.log(`${id} - ${street} - size ${size} price ${price} rooms ${rooms} zip ${zip}`);
 
         $s.find('.search-result-info').eq(1).append(`<span>• ${getPricePerSqm(size, price)}</span>`);
-
-        // $.ajax({
-        //     type : "POST",
-        //     url : "http://localhost:5000/",
-        //     contentType : "application/json; charset=UTF-8",
-        //     data : JSON.stringify({ id, street, size, price, rooms, zip })
-        // });
     });
 }
 
