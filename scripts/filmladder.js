@@ -17,6 +17,11 @@ var style = `
         width: 140px;
         height: 240px;
         overflow: hidden;
+        margin: 10px;
+    }
+
+    .sheet > div.collapsed .hall-container {
+        display: none;
     }
 
     [collapse-times] {

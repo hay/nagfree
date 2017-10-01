@@ -23,10 +23,16 @@ $("body").append(`<style>
     .best-review-score,
     .dates_rec_sr,
     .ribbon,
+    .pub_trans,
     .free-cancel-persuasion,
     .sr-badges__row,
     .featuredRooms thead,
     .usp-hotelpage--chains,
+    .smaller-low-av-msg_wrapper,
+    .soldout_property,
+    .gs-discount-tag,
+    .strike-it-red_anim,
+    .review-score-widget__text,
     .sr__guest-favorite {
         display: none !important;
     }
@@ -35,7 +41,11 @@ $("body").append(`<style>
         top: 13px !important;
     }
 
-    .scarcity_color {
+    .scarcity_color,
+    .site_discount_price {
         color: black !important;
     }
 </style>`);
+
+$("span:contains('Bekijk onze laatste beschikbare kamers') span")
+    .text('Bekijk onze beschikbare kamers');
