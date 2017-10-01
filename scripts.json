@@ -9,6 +9,7 @@
     "flickr.com" : "flickr",
     "funda.nl" : "funda",
     "getrevue.co" : "revue",
+    "google.nl" : "google",
     "instagram.com" : "instagram",
     "medium.com" : "medium",
     "nos.nl" : "npocookie",
@@ -17,5 +18,6 @@
     "twitter.com" : "twitter",
     "vara.nl" : "npocookie",
     "volkskrant.nl" : "volkskrant",
-    "vpro.nl" : "npocookie"
+    "vpro.nl" : "npocookie",
+    "yelp.com" : "yelp"
 }
