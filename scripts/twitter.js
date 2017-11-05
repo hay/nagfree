@@ -8,7 +8,7 @@
   * Copyright (c) 2016 Jonathan Suh <hello@jonsuh.com>
   */
 
-var tcoRemove = (function() {
+const tcoRemove = (function() {
   "use strict";
 
   /**
@@ -122,7 +122,11 @@ var tcoRemove = (function() {
 
 tcoRemove.init();
 
-// Remove the useless 'while you were away' box
-nagfree.waitForSelector(".has-recap", () => {
-    $(".has-recap").remove();
-})
+$("body").append(`<style>
+  /* Remove the useless 'while you were away' box and
+  'here's someone who tweeted' stuff */
+  .has-recap,
+  .js-activity-generic {
+    display: none;
+  }
+</style>`)
