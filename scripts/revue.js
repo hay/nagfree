@@ -8,3 +8,7 @@ $("body").append(`<style>
         justify-content: center;
     }
 </style>`);
+
+export default {
+    'name' : 'revue'
+}

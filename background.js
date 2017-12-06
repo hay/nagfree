@@ -1,14 +1,14 @@
-var sites = null;
-var log = console.log.bind(console);
+const log = console.log.bind(console);
+const hosts = {};
+const queries = {};
 
-function getFilterPath(url) {
-    var url = new URL(url);
-    const hostname = url.hostname.replace('www.', '');
-    return sites[hostname] ? `scripts/${sites[hostname]}.js` : false;
+function getHostname(url) {
+    url = new URL(url);
+    return url.hostname.replace('www.', '');
 }
 
 // Why doesn't Promise have this natively?
-Promise.series = function(series) {
+function runPromises(series) {
     return series.reduce((p, fn) => p.then(fn), Promise.resolve());
 };
 
@@ -20,7 +20,7 @@ function executeScripts(tabId, scripts) {
         });
     });
 
-    Promise.series(scripts).then(() => log('Loaded all scripts'));
+    runPromises(scripts).then(() => log('Loaded all scripts'));
 }
 
 function handleUpdate(tabId, changeInfo, tab) {
@@ -43,13 +43,81 @@ function handleUpdate(tabId, changeInfo, tab) {
     ]);
 }
 
+function getScriptsInDirectory(directory, callback) {
+    chrome.runtime.getPackageDirectoryEntry((entry) => {
+        entry.getDirectory(directory, { create : false }, (dir) => {
+            const reader = dir.createReader();
+            reader.readEntries((results) => {
+                results = results.map(entry => `./${directory}/${entry.name}`);
+                callback(results);
+            });
+        });
+    })
+}
+
+function executeModuleInTab(tabId, module) {
+    log(`Loading module ${module.src}`);
+
+    if (module.css) {
+        chrome.tabs.insertCSS(tabId, {
+            code : module.css
+        });
+    }
+}
+
+function parseModule(module, src) {
+    // For easy reference later
+    module.src = src;
+
+    if (module.host) {
+        hosts[module.host] = module;
+    } else if (module.query) {
+        queries[module.query] = module;
+    }
+}
+
+function setupInjector() {
+    chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
+        if (change.status === 'complete') {
+            const hostname = getHostname(tab.url);
+
+            if (hostname in hosts) {
+                executeModuleInTab(tabId, hosts[hostname]);
+                return;
+            }
+
+            for (let query in queries) {
+                chrome.tabs.executeScript(tabId, {
+                    code : `!!document.querySelector('${query}');`
+                }, (result) => {
+                    if (result[0]) {
+                        executeModuleInTab(tabId, queries[query])
+                    }
+                });
+            }
+        }
+    });
+}
+
 function main() {
+    getScriptsInDirectory("scripts2", (scripts) => {
+        scripts = scripts.map((script) => {
+            return import(script).then(m => parseModule(m.default, script));
+        });
+
+        Promise.all(scripts).then(() => {
+            setupInjector();
+        });
+    });
+
+    /*
     var scriptsUrl = chrome.extension.getURL('scripts.json');
 
     fetch(scriptsUrl).then((res) => res.json()).then((scripts) => {
         sites = scripts;
         chrome.tabs.onUpdated.addListener(handleUpdate);
     });
+    */
 }
 
 main();
