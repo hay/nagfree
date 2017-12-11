@@ -1,4 +1,5 @@
 const log = console.log.bind(console);
+const SCRIPTS_PATH = 'scripts2';
 const hosts = {};
 const queries = {};
 
@@ -23,46 +24,64 @@ function executeScripts(tabId, scripts) {
     runPromises(scripts).then(() => log('Loaded all scripts'));
 }
 
-function handleUpdate(tabId, changeInfo, tab) {
-    if (changeInfo.status !== 'complete') return;
+function getScriptsInDirectory(directory) {
+    log('Loading scripts');
 
-    var path = getFilterPath(tab.url);
+    return new Promise((resolve, reject) => {
+        chrome.runtime.getPackageDirectoryEntry((entry) => {
+            entry.getDirectory(directory, { create : false }, (dir) => {
+                const reader = dir.createReader();
 
-    if (!path) {
-        log(`No filter found for ${tab.url}`);
-        return;
-    }
-
-    log(`Found filter for ${tab.url}, now injecting`);
-
-    executeScripts(tabId, [
-        'lib/jquery/dist/jquery.js',
-        'lib/underscore/underscore-min.js',
-        'nagfree.js',
-        path
-    ]);
+                reader.readEntries((results) => {
+                    results = results.map(entry => `./${directory}/${entry.name}`);
+                    resolve(results);
+                });
+            });
+        })
+    });
 }
 
-function getScriptsInDirectory(directory, callback) {
-    chrome.runtime.getPackageDirectoryEntry((entry) => {
-        entry.getDirectory(directory, { create : false }, (dir) => {
-            const reader = dir.createReader();
-            reader.readEntries((results) => {
-                results = results.map(entry => `./${directory}/${entry.name}`);
-                callback(results);
-            });
+function moduleLoaded(tabId) {
+    return new Promise((resolve, reject) => {
+        chrome.tabs.executeScript(tabId, {
+            code : `document.querySelector('html').setAttribute('nagfree-loaded', '');`
+        }, (result) => {
+            log('moduleLoadedAttribute');
+            resolve();
         });
-    })
+    });
 }
 
 function executeModuleInTab(tabId, module) {
     log(`Loading module ${module.src}`);
 
-    if (module.css) {
-        chrome.tabs.insertCSS(tabId, {
-            code : module.css
+    // We know we can load a module, first set the 'nagfree-loaded' attribute, then
+    // load the actual module
+    moduleLoaded(tabId).then(() => {
+        if (module.css) {
+            log('Inserting CSS');
+
+            chrome.tabs.insertCSS(tabId, {
+                code : module.css
+            });
+        }
+
+        if (module.js) {
+            const src = chrome.runtime.getURL(module.src);
+            log(`Injecting Javascript ${src}`);
+        }
+    });
+}
+
+function moduleExecutedOnPage(tabId) {
+    return new Promise((resolve, reject) => {
+        chrome.tabs.executeScript(tabId, {
+            code : `document.documentElement.hasAttribute('nagfree-loaded');`
+        }, (result) => {
+            log('moduleExecutedOnPage', result);
+            resolve(result && result.length && result[0])
         });
-    }
+    });
 }
 
 function parseModule(module, src) {
@@ -77,47 +96,73 @@ function parseModule(module, src) {
 }
 
 function setupInjector() {
-    chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
-        if (change.status === 'complete') {
-            const hostname = getHostname(tab.url);
+    log('Setting up injector');
 
-            if (hostname in hosts) {
-                executeModuleInTab(tabId, hosts[hostname]);
-                return;
-            }
+    chrome.webNavigation.onCompleted.addListener((details) => {
+        const { tabId, url } = details;
+        const hostname = getHostname(url);
 
-            for (let query in queries) {
-                chrome.tabs.executeScript(tabId, {
-                    code : `!!document.querySelector('${query}');`
-                }, (result) => {
-                    if (result[0]) {
-                        executeModuleInTab(tabId, queries[query])
-                    }
-                });
-            }
+        if (hostname in hosts) {
+            log('Hostname found, executing module');
+            executeModuleInTab(tabId, hosts[hostname]);
+            return;
+        }
+
+        for (let query in queries) {
+            chrome.tabs.executeScript(tabId, {
+                code : `!!document.querySelector('${query}');`
+            }, (result) => {
+                if (result[0]) {
+                    log(`Query '${query}' found, executing module`);
+                    executeModuleInTab(tabId, queries[query])
+                }
+            });
         }
     });
+
+    /*
+    chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
+        if (change.status === 'complete') {
+            log('changes', change);
+
+            moduleExecutedOnPage(tabId).then((isExecuted) => {
+                if (isExecuted) {
+                    log('Already executed!');
+                    return;
+                }
+
+                const hostname = getHostname(tab.url);
+
+                if (hostname in hosts) {
+                    log('Hostname found, executing module');
+                    executeModuleInTab(tabId, hosts[hostname]);
+                    return;
+                }
+
+                for (let query in queries) {
+                    chrome.tabs.executeScript(tabId, {
+                        code : `!!document.querySelector('${query}');`
+                    }, (result) => {
+                        if (result[0]) {
+                            log('Query found, executing module');
+                            executeModuleInTab(tabId, queries[query])
+                        }
+                    });
+                }
+            });
+        }
+    });
+    */
 }
 
 function main() {
-    getScriptsInDirectory("scripts2", (scripts) => {
+    getScriptsInDirectory(SCRIPTS_PATH).then((scripts) => {
         scripts = scripts.map((script) => {
             return import(script).then(m => parseModule(m.default, script));
         });
 
-        Promise.all(scripts).then(() => {
-            setupInjector();
-        });
+        Promise.all(scripts).then(setupInjector);
     });
-
-    /*
-    var scriptsUrl = chrome.extension.getURL('scripts.json');
-
-    fetch(scriptsUrl).then((res) => res.json()).then((scripts) => {
-        sites = scripts;
-        chrome.tabs.onUpdated.addListener(handleUpdate);
-    });
-    */
 }
 
 main();

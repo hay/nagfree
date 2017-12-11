@@ -1,3 +1,7 @@
+function run() {
+    document.querySelector(".metabar").classList.remove('u-fixed');
+}
+
 // Remove nonsense
 export default {
     query : 'meta[name="twitter:app:name:iphone"][content="Medium"]',
@@ -12,5 +16,7 @@ export default {
         .metabar {
             position: relative !important;
         }
-    `
+    `,
+
+    js : run
 };

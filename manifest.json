@@ -3,7 +3,11 @@
     "name": "Nagfree",
     "description": "Makes a few sites a little better",
     "version": "0.1",
-    "permissions" : ["tabs", "<all_urls>"],
+    "permissions" : [
+        "tabs",
+        "webNavigation",
+        "<all_urls>"
+    ],
     "web_accessible_resources" : [
         "*.js",
         "lib/*.js",
