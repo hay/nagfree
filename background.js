@@ -3,25 +3,21 @@ const SCRIPTS_PATH = 'scripts2';
 const hosts = {};
 const queries = {};
 
+
 function getHostname(url) {
     url = new URL(url);
     return url.hostname.replace('www.', '');
 }
 
-// Why doesn't Promise have this natively?
-function runPromises(series) {
-    return series.reduce((p, fn) => p.then(fn), Promise.resolve());
-};
-
-function executeScripts(tabId, scripts) {
-    scripts = scripts.map((script) => {
-        return new Promise( (resolve) => {
-            log(`Loading ${script}`);
-            chrome.tabs.executeScript(tabId, { file : script }, resolve);
-        });
-    });
-
-    runPromises(scripts).then(() => log('Loaded all scripts'));
+// Yes, this is pretty much voodoo
+function getJsModuleLoader(extensionSrc) {
+    return `
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = '${chrome.runtime.getURL('nagfree-loader.js')}';
+        script.setAttribute('nagfree-extension', '${extensionSrc}');
+        document.querySelector('body').appendChild(script);
+    `;
 }
 
 function getScriptsInDirectory(directory) {
@@ -55,6 +51,12 @@ function executeModuleInTab(tabId, module) {
     if (module.js) {
         const src = chrome.runtime.getURL(module.src);
         log(`Injecting Javascript ${src}`);
+
+        chrome.tabs.executeScript(tabId, {
+            code : getJsModuleLoader(src)
+        }, () => {
+            chrome.tabs.sendMessage(tabId, { injectModule : src });
+        });
     }
 }
 

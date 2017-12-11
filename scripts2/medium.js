@@ -1,7 +1,3 @@
-function run() {
-    document.querySelector(".metabar").classList.remove('u-fixed');
-}
-
 // Remove nonsense
 export default {
     query : 'meta[name="twitter:app:name:iphone"][content="Medium"]',
@@ -19,5 +15,7 @@ export default {
         }
     `,
 
-    js : run
+    js() {
+        document.querySelector(".metabar").classList.remove('u-fixed');
+    }
 };
