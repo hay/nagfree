@@ -1,6 +1,26 @@
 // The voodoo bootstrap to import the actual extension code
 const extension = document.querySelector('[nagfree-extension]');
 const $ = document.querySelector.bind(document);
+const URL_CHANGE_TIMEOUT = 300;
+const WAIT_FOR_SELECTOR_TIMEOUT = 300;
+
+function onUrlChange(callback) {
+    // This is pretty horrible
+    let oldUrl = window.location.href;
+
+    function check() {
+        let newUrl = window.location.href;
+
+        if (newUrl !== oldUrl) {
+            callback();
+            oldUrl = newUrl;
+        }
+
+        window.requestIdleCallback(check, { timeout : URL_CHANGE_TIMEOUT });
+    }
+
+    check();
+}
 
 function waitForSelector(selector) {
     let tries = 10;
@@ -11,7 +31,7 @@ function waitForSelector(selector) {
                 resolve();
             } else {
                 tries--;
-                window.requestIdleCallback(check, { timeout : 300 });
+                window.requestIdleCallback(check, { timeout : WAIT_FOR_SELECTOR_TIMEOUT });
             }
         }
 
@@ -25,10 +45,19 @@ function runJs(js) {
     if (typeof js === 'function') {
         js();
     } else {
-        const run = js.run;
+        function run() {
+            if (js.waitForSelector) {
+                waitForSelector(js.waitForSelector).then(js.run);
+            } else {
+                js.run();
+            }
+        }
 
-        if (js.waitForSelector) {
-            waitForSelector(js.waitForSelector).then(run);
+        if (js.runOnUrlChange) {
+            // Run every time the URL changes
+            onUrlChange(() => {
+                run();
+            });
         } else {
             run();
         }

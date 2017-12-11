@@ -1,4 +1,5 @@
 const PRODUCT_LANE_SELECTOR = '.product-lane .product-cardview .product-price';
+const PAGE_SELECTOR = '.canvas-page';
 
 function addPricePerKg() {
     const $el = $(this);
@@ -32,6 +33,7 @@ export default {
 
     js : {
         run : addPricesToProductlanes,
+        runOnUrlChange : true,
         waitForSelector : PRODUCT_LANE_SELECTOR
     }
 };
