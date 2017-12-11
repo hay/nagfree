@@ -41,47 +41,21 @@ function getScriptsInDirectory(directory) {
     });
 }
 
-function moduleLoaded(tabId) {
-    return new Promise((resolve, reject) => {
-        chrome.tabs.executeScript(tabId, {
-            code : `document.querySelector('html').setAttribute('nagfree-loaded', '');`
-        }, (result) => {
-            log('moduleLoadedAttribute');
-            resolve();
-        });
-    });
-}
-
 function executeModuleInTab(tabId, module) {
     log(`Loading module ${module.src}`);
 
-    // We know we can load a module, first set the 'nagfree-loaded' attribute, then
-    // load the actual module
-    moduleLoaded(tabId).then(() => {
-        if (module.css) {
-            log('Inserting CSS');
+    if (module.css) {
+        log('Inserting CSS');
 
-            chrome.tabs.insertCSS(tabId, {
-                code : module.css
-            });
-        }
-
-        if (module.js) {
-            const src = chrome.runtime.getURL(module.src);
-            log(`Injecting Javascript ${src}`);
-        }
-    });
-}
-
-function moduleExecutedOnPage(tabId) {
-    return new Promise((resolve, reject) => {
-        chrome.tabs.executeScript(tabId, {
-            code : `document.documentElement.hasAttribute('nagfree-loaded');`
-        }, (result) => {
-            log('moduleExecutedOnPage', result);
-            resolve(result && result.length && result[0])
+        chrome.tabs.insertCSS(tabId, {
+            code : module.css
         });
-    });
+    }
+
+    if (module.js) {
+        const src = chrome.runtime.getURL(module.src);
+        log(`Injecting Javascript ${src}`);
+    }
 }
 
 function parseModule(module, src) {
@@ -119,40 +93,6 @@ function setupInjector() {
             });
         }
     });
-
-    /*
-    chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
-        if (change.status === 'complete') {
-            log('changes', change);
-
-            moduleExecutedOnPage(tabId).then((isExecuted) => {
-                if (isExecuted) {
-                    log('Already executed!');
-                    return;
-                }
-
-                const hostname = getHostname(tab.url);
-
-                if (hostname in hosts) {
-                    log('Hostname found, executing module');
-                    executeModuleInTab(tabId, hosts[hostname]);
-                    return;
-                }
-
-                for (let query in queries) {
-                    chrome.tabs.executeScript(tabId, {
-                        code : `!!document.querySelector('${query}');`
-                    }, (result) => {
-                        if (result[0]) {
-                            log('Query found, executing module');
-                            executeModuleInTab(tabId, queries[query])
-                        }
-                    });
-                }
-            });
-        }
-    });
-    */
 }
 
 function main() {

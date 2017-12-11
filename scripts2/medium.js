@@ -9,6 +9,7 @@ export default {
     css : `
         .js-stickyFooter,
         .metabar--spacer,
+        .postActionsBar,
         .js-postShareWidget {
             display: none;
         }
