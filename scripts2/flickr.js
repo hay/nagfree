@@ -1,6 +1,7 @@
-// Remove Spaceball to allow right-click to download photos
+// Remove Spaceball to allow right-click to download photos from the
+// 'all sizes' download page
 export default {
     host : 'flickr.com',
 
-    css : `.flickr-logo-container { display: none; }`
+    css : `.spaceball { display: none; }`
 };
