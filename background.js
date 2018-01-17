@@ -3,7 +3,6 @@ const SCRIPTS_PATH = 'scripts2';
 const hosts = {};
 const queries = {};
 
-
 function getHostname(url) {
     url = new URL(url);
     return url.hostname.replace('www.', '');
