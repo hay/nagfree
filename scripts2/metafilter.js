@@ -27,12 +27,7 @@ export default {
 
                 posts.sort((a,b) => a.favorites > b.favorites ? -1 : 1);
 
-                // A bit ugly
-                $$("#posts > *").forEach((el, index) => {
-                    if (index > 1) {
-                        el.remove();
-                    }
-                });
+                $$("#posts .copy ~ *").forEach(e => e.remove());
 
                 const html = posts.map((p) => `<br><br>${p.html}<br>`).join('');
                 $("#posts").innerHTML += html;

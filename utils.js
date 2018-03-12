@@ -6,19 +6,11 @@ export function $$(selector) {
     return Array.from(document.querySelectorAll(selector));
 }
 
-export function waitFor(fn, timeout, tries = 10) {
-    return new Promise((resolve, reject) => {
-        function check() {
-            if (fn() || tries === 0) {
-                resolve();
-            } else {
-                tries--;
-                window.requestIdleCallback(check, { timeout });
-            }
-        }
-
-        check();
-    });
+export function elementFromHtml(html) {
+    const template = document.createElement('template');
+    html = html.trim();
+    template.innerHTML = html;
+    return template.content.firstChild;
 }
 
 export function tryFor(times = 10, timeout = 1000, fn) {
@@ -33,6 +25,21 @@ export function tryFor(times = 10, timeout = 1000, fn) {
     }
 
     go();
+}
+
+export function waitFor(fn, timeout, tries = 10) {
+    return new Promise((resolve, reject) => {
+        function check() {
+            if (fn() || tries === 0) {
+                resolve();
+            } else {
+                tries--;
+                window.requestIdleCallback(check, { timeout });
+            }
+        }
+
+        check();
+    });
 }
 
 export function waitForSelector(selector, timeout) {
