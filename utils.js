@@ -6,9 +6,7 @@ export function $$(selector) {
     return Array.from(document.querySelectorAll(selector));
 }
 
-export function waitFor(fn, timeout) {
-    let tries = 10;
-
+export function waitFor(fn, timeout, tries = 10) {
     return new Promise((resolve, reject) => {
         function check() {
             if (fn() || tries === 0) {
@@ -21,6 +19,20 @@ export function waitFor(fn, timeout) {
 
         check();
     });
+}
+
+export function tryFor(times = 10, timeout = 1000, fn) {
+    function go() {
+        fn();
+
+        if (times > 0) {
+            window.requestIdleCallback(go, { timeout });
+        } else {
+            times--;
+        }
+    }
+
+    go();
 }
 
 export function waitForSelector(selector, timeout) {
