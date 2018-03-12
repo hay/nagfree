@@ -2,6 +2,7 @@ import { $, $$ } from '../utils.js';
 
 export default {
     host : 'filmladder.nl',
+
     css : `
         .margin, .banner {
             display: none;
