@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Nagfree",
-    "description": "Makes a few sites a little better",
+    "description": "Makes sites a little better",
     "version": "0.2",
     "permissions" : [
         "tabs",
