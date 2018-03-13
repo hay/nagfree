@@ -47,6 +47,14 @@ function search() {
 export default {
     host : 'funda.nl',
 
+    css : `
+        .top-position,
+        .makelaar-ads,
+        .related-search {
+            display: none;
+        }
+    `,
+
     js : {
         runOnUrlChange : true,
 

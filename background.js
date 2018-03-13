@@ -1,5 +1,5 @@
 const log = console.log.bind(console);
-const SCRIPTS_PATH = 'scripts2';
+const SCRIPTS_PATH = 'scripts';
 const hosts = {};
 const queries = {};
 
