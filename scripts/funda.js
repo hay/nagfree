@@ -25,7 +25,9 @@ function page() {
 
     const price = nr($price.textContent);
 
-    $price.innerHTML += ` / ${size}m² / ${getPricePerSqm(size, price)}`;
+    if (!$price.querySelector('[data-price-per-sqm]')) {
+        $price.innerHTML += `<span data-price-per-sqm> / ${size}m² / ${getPricePerSqm(size, price)}</span>`;
+    }
 }
 
 function search() {
