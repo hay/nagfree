@@ -64,3 +64,33 @@ export function waitForSelector(selector, timeout) {
 
     return waitFor(check, timeout);
 }
+
+export class Storage {
+    constructor(data) {
+        this._store = window.localStorage;
+        this._key = '__nagfree__';
+
+        if (!!this._store.getItem(this._key)) {
+            const jsonData = this._store.getItem(this._key);
+            this._data = JSON.parse(jsonData);
+        } else {
+            this._data = data;
+            this.save();
+        }
+    }
+
+    get(key) {
+        return this._data[key];
+    }
+
+    set(key, val) {
+        this._data[key] = val;
+        alert(JSON.stringify(this._data));
+        this.save();
+    }
+
+    save() {
+        const json = JSON.stringify(this._data);
+        this._store.setItem(this._key, json);
+    }
+}
