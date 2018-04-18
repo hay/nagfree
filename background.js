@@ -5,27 +5,32 @@ function getHostname(url) {
     return url.hostname.replace('www.', '');
 }
 
-// Yes, this is pretty much voodoo
-function injectScripts(tabId, modules) {
-    let scripts = modules.filter(m => !!m.module.js).map(m => m.module.src);
-    scripts = JSON.stringify(scripts);
-
-    chrome.tabs.executeScript(tabId, {
-        code : `
-            (function() {
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.dataset.scripts = '${scripts}';
-                script.src = '${chrome.runtime.getURL('nagfree-loader.js')}';
-                document.querySelector('body').appendChild(script);
-            })();
-        `
+// Promisified wrapper
+function executeScript(tabId, code) {
+    return new Promise((resolve) => {
+        chrome.tabs.executeScript(tabId, { code }, resolve);
     });
 }
 
-function getScriptsInDirectory(directory) {
-    console.log('Loading scripts');
+// Yes, this is pretty much voodoo
+function injectScripts(tabId, modules) {
+    let scripts = modules.filter(m => !!m.js).map(m => m.src);
+    scripts = JSON.stringify(scripts);
 
+    const code = `
+        (function() {
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.dataset.scripts = '${scripts}';
+            script.src = '${chrome.runtime.getURL('nagfree-loader.js')}';
+            document.querySelector('body').appendChild(script);
+        })();
+    `;
+
+    executeScript(tabId, code);
+}
+
+function getScriptsInDirectory(directory) {
     return new Promise((resolve, reject) => {
         chrome.runtime.getPackageDirectoryEntry((entry) => {
             entry.getDirectory(directory, { create : false }, (dir) => {
@@ -49,36 +54,26 @@ function onLoad(resolve) {
     });
 }
 
-function checkModule({ tabId, hostname, module }, resolve) {
-    let passed = false;
+async function checkModule({ tabId, hostname, module }) {
+    if (!module.host && !module.query) {
+        console.log(`${module.src} has no host or query check!`);
+    }
 
     if (module.host && module.host === hostname) {
-        console.log(`Hostname found, executing module ${module.src}`);
-        passed = true;
+        return module;
     }
 
     if (module.query) {
-        chrome.tabs.executeScript(tabId, {
-            code : `!!document.querySelector('${module.query}');`
-        }, (result) => {
-            if (result[0]) {
-                console.log(`Query '${module.query}' found, executing module ${module.src}`);
-                resolve({tabId, module});
-            } else {
-                resolve(false);
-            }
-        });
-    } else {
-        if (passed) {
-            resolve({tabId, module});
-        } else {
-            resolve(false);
-        }
+        const code = `!!document.querySelector('${module.query}');`;
+        const result = await executeScript(tabId, code);
+        return result[0] ? module : false;
     }
+
+    return false;
 }
 
 function injectCss(tabId, modules) {
-    const css = modules.map(m => m.module.css ? m.module.css : '').join('\n');
+    const css = modules.map(m => m.css ? m.css : '').join('\n');
 
     chrome.tabs.insertCSS(tabId, {
         code : css
@@ -91,46 +86,31 @@ async function loadModule(script) {
     return module.default;
 }
 
-function mapCallbacks(chain, callback) {
-    let tries = chain.length;
-
-    for (let i = 0; i < chain.length; i++) {
-        const fn = chain[i];
-
-        fn((result) => {
-            chain[i] = result;
-            tries--;
-
-            if (tries === 0) {
-                callback(chain);
-            }
-        });
-    }
-}
-
 async function main() {
+    console.log('Loading modules');
     let scripts = await getScriptsInDirectory(SCRIPTS_PATH);
     scripts = scripts.map(async (script) => await loadModule(script));
+    console.log(`${scripts.length} modules available`);
 
     const allModules = await Promise.all(scripts);
 
-    // Note how we use old fashioned callbacks here instead of promises,
-    // because the background.js runs all the time but needs to execute this
-    // stuff every time we have a page reload, we can't use promises
-    // because they only execute *once*. Instead of that, we use some
-    // old school async stuff
-    onLoad(({ tabId, hostname }) => {
-        let modules = allModules.map((module) => {
-            return function(resolve) {
-                checkModule({ tabId, hostname, module }, resolve);
-            };
+    // Note how we use an old fashioned callback here for onLoad instead of
+    // a promise, because the background.js runs all the time but needs to
+    // execute this stuff every time we have a page reload, we can't use a
+    // promise because they only execute *once*.
+    onLoad(async function({ tabId, hostname }) {
+        // Loop through all modules and check if the host or query check
+        // is valid for the current tab, after that filter that
+        // to all the usable modules
+        let modules = allModules.map(async function(module) {
+            return await checkModule({ tabId, hostname, module });
         });
+        modules = (await Promise.all(modules)).filter(m => !!m);
 
-        mapCallbacks(modules, (modules) => {
-            modules = modules.filter(m => !!m);
-            injectCss(tabId, modules);
-            injectScripts(tabId, modules)
-        });
+        console.log(`${modules.length} module(s) will be loaded for this tab`);
+
+        injectCss(tabId, modules);
+        injectScripts(tabId, modules)
     });
 }
 

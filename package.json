@@ -4,8 +4,5 @@
   "repository": "git@github.com:hay/nagfree.git",
   "author": "Hay Kranen <huskyr@gmail.com>",
   "license": "MIT",
-  "private": true,
-  "dependencies": {
-    "vue": "^2.5.16"
-  }
+  "private": true
 }

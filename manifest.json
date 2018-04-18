@@ -10,8 +10,6 @@
     ],
     "web_accessible_resources" : [
         "*.js",
-        "lib/*.js",
-        "scripts.json",
         "scripts/*.js"
     ],
     "background" : {
