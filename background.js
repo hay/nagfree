@@ -12,10 +12,31 @@ function executeScript(tabId, code) {
     });
 }
 
+function injectCss(tabId, modules) {
+    const css = modules.map(m => m.css ? m.css : '');
+
+    if (!css.length) {
+        return;
+    }
+
+    console.log('Injecting CSS');
+
+    chrome.tabs.insertCSS(tabId, {
+        code : css.join('\n')
+    });
+}
+
 // Yes, this is pretty much voodoo
 function injectScripts(tabId, modules) {
     let scripts = modules.filter(m => !!m.js).map(m => m.src);
+
+    if (!scripts.length) {
+        return;
+    }
+
     scripts = JSON.stringify(scripts);
+
+    console.log('Injecting scripts');
 
     const code = `
         (function() {
@@ -72,14 +93,6 @@ async function checkModule({ tabId, hostname, module }) {
     }
 
     return false;
-}
-
-function injectCss(tabId, modules) {
-    const css = modules.map(m => m.css ? m.css : '').join('\n');
-
-    chrome.tabs.insertCSS(tabId, {
-        code : css
-    });
 }
 
 async function loadModule(script) {
