@@ -19,11 +19,13 @@ function injectScripts(tabId, modules) {
 
     const code = `
         (function() {
-            const script = document.createElement('script');
-            script.type = 'module';
-            script.dataset.scripts = '${scripts}';
-            script.src = '${chrome.runtime.getURL('nagfree-loader.js')}';
-            document.querySelector('body').appendChild(script);
+            if (!document.querySelector('script[src*="nagfree-loader"]')) {
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.dataset.scripts = '${scripts}';
+                script.src = '${chrome.runtime.getURL('nagfree-loader.js')}';
+                document.querySelector('body').appendChild(script);
+            }
         })();
     `;
 
@@ -113,12 +115,12 @@ async function main() {
         });
         modules = (await Promise.all(modules)).filter(m => !!m);
 
-        console.log(`${modules.length} module(s) will be loaded for this tab`);
-
-        injectCss(tabId, modules);
-        injectScripts(tabId, modules)
-
-        console.log(`Injecting took ${Date.now() - then}ms`);
+        if (modules.length > 0) {
+            console.log(`${modules.length} module(s) will be loaded for this tab`);
+            injectCss(tabId, modules);
+            injectScripts(tabId, modules)
+            console.log(`Injecting took ${Date.now() - then}ms`);
+        }
     });
 }
 
