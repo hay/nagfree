@@ -1,7 +1,7 @@
 import { $, waitForSelector } from './utils.js';
 
 // The voodoo bootstrap to import the actual extension code
-const extension = $('[nagfree-extension]');
+const script = $('script[src*="nagfree-loader.js"]');
 const URL_CHANGE_TIMEOUT = 300;
 const WAIT_FOR_SELECTOR_TIMEOUT = 300;
 
@@ -50,12 +50,16 @@ function runJs(js) {
     }
 }
 
-if (extension) {
-    const src = extension.getAttribute('nagfree-extension');
+function loadModules() {
+    const scripts = JSON.parse(script.dataset.scripts);
 
-    import(src).then((module) => {
-        if (module.default && module.default.js) {
-            runJs(module.default.js);
-        }
+    scripts.forEach((src) => {
+        import(src).then((module) => {
+            if (module.default && module.default.js) {
+                runJs(module.default.js);
+            }
+        });
     });
 }
+
+loadModules();

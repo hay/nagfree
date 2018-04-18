@@ -2,20 +2,40 @@ const log = console.log.bind(console);
 const SCRIPTS_PATH = 'scripts';
 const modules = [];
 
+chrome.runtime.onMessage.addListener((req, sender, res) => {
+    console.log('message');
+    console.log(req);
+});
+
+chrome.runtime.onMessageExternal.addListener(
+  function(request, sender, sendResponse) {
+    console.log('ja ho');
+    console.log(request);
+  });
+
+
 function getHostname(url) {
     url = new URL(url);
     return url.hostname.replace('www.', '');
 }
 
 // Yes, this is pretty much voodoo
-function getJsModuleLoader(extensionSrc) {
-    return `
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.src = '${chrome.runtime.getURL('nagfree-loader.js')}';
-        script.setAttribute('nagfree-extension', '${extensionSrc}');
-        document.querySelector('body').appendChild(script);
-    `;
+function injectScripts(tabId, scripts) {
+    console.log('Injecting loader');
+    scripts = JSON.stringify(scripts);
+    console.log(scripts);
+
+    chrome.tabs.executeScript(tabId, {
+        code : `
+            (function() {
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.dataset.scripts = '${scripts}';
+                script.src = '${chrome.runtime.getURL('nagfree-loader.js')}';
+                document.querySelector('body').appendChild(script);
+            })();
+        `
+    });
 }
 
 function getScriptsInDirectory(directory) {
@@ -35,35 +55,11 @@ function getScriptsInDirectory(directory) {
     });
 }
 
-function executeModule({ tabId, module }) {
-    log(`Loading module ${module.src}`);
-
-    if (module.css) {
-        log('Inserting CSS');
-
-        chrome.tabs.insertCSS(tabId, {
-            code : module.css
-        });
-    }
-
-    if (module.js) {
-        const src = chrome.runtime.getURL(module.src);
-        log(`Injecting Javascript ${src}`);
-
-        chrome.tabs.executeScript(tabId, {
-            code : getJsModuleLoader(src)
-        }, () => {
-            chrome.tabs.sendMessage(tabId, { injectModule : src });
-        });
-    }
-}
-
 function loadModules() {
-    log('Setting up injector');
-
-    const modulesToLoad = [];
+    log('Queing up modules');
 
     chrome.webNavigation.onCompleted.addListener((details) => {
+        const modulesToLoad = [];
         const { tabId, url } = details;
         const hostname = getHostname(url);
 
@@ -92,7 +88,30 @@ function loadModules() {
         });
 
         Promise.all(modulesPromises).then(() => {
-            modulesToLoad.forEach(executeModule);
+            // Just take the first tabId, we may want to customize this
+            // later, but haven't yet found a usecase for using different
+            // tabIds
+            const tabId = modulesToLoad[0].tabId;
+
+            // Make an array of all scripts of modules with a js function,
+            // we need to inject those
+            const scripts = modulesToLoad
+                .filter(m => !!m.module.js)
+                .map(m => m.module.src);
+
+            // Inject CSS
+            const css = modulesToLoad
+                .filter(m => !!m.module.css)
+                .map(m => m.module.css)
+                .join('\n');
+
+            // Inject styles
+            chrome.tabs.insertCSS(tabId, {
+                code : css
+            });
+
+            // Finally inject scripts
+            injectScripts(tabId, scripts);
         });
 
     });
