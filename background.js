@@ -35,7 +35,7 @@ function getScriptsInDirectory(directory) {
     });
 }
 
-function executeModuleInTab(tabId, module) {
+function executeModule({ tabId, module }) {
     log(`Loading module ${module.src}`);
 
     if (module.css) {
@@ -58,31 +58,43 @@ function executeModuleInTab(tabId, module) {
     }
 }
 
-function setupInjector() {
+function loadModules() {
     log('Setting up injector');
+
+    const modulesToLoad = [];
 
     chrome.webNavigation.onCompleted.addListener((details) => {
         const { tabId, url } = details;
         const hostname = getHostname(url);
 
-        modules.forEach((module) => {
-            if (module.host && module.host === hostname) {
-                log('Hostname found, executing module');
-                executeModuleInTab(tabId, module);
-                return;
-            }
+        const modulesPromises = modules.map((module) => {
+            return new Promise((resolve, reject) => {
+                if (module.host && module.host === hostname) {
+                    log(`Hostname found, executing module ${module.src}`);
+                    modulesToLoad.push({tabId, module});
+                }
 
-            if (module.query) {
-                chrome.tabs.executeScript(tabId, {
-                    code : `!!document.querySelector('${module.query}');`
-                }, (result) => {
-                    if (result[0]) {
-                        log(`Query '${module.query}' found, executing module`);
-                        executeModuleInTab(tabId, module)
-                    }
-                });
-            }
+                if (module.query) {
+                    chrome.tabs.executeScript(tabId, {
+                        code : `!!document.querySelector('${module.query}');`
+                    }, (result) => {
+                        if (result[0]) {
+                            log(`Query '${module.query}' found, executing module ${module.src}`);
+                            modulesToLoad.push({tabId, module});
+                        }
+
+                        resolve();
+                    });
+                } else {
+                    resolve();
+                }
+            });
         });
+
+        Promise.all(modulesPromises).then(() => {
+            modulesToLoad.forEach(executeModule);
+        });
+
     });
 }
 
@@ -95,7 +107,7 @@ function main() {
             });
         });
 
-        Promise.all(scripts).then(setupInjector);
+        Promise.all(scripts).then(loadModules);
     });
 }
 
