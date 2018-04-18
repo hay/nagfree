@@ -52,7 +52,7 @@ function onLoad(resolve) {
     chrome.webNavigation.onCompleted.addListener((details) => {
         const { tabId, url } = details;
         const hostname = getHostname(url);
-        resolve({ tabId, hostname });
+        resolve({ hostname, tabId, url });
     });
 }
 
@@ -104,7 +104,7 @@ async function main() {
     // a promise, because the background.js runs all the time but needs to
     // execute this stuff every time we have a page reload, we can't use a
     // promise because they only execute *once*.
-    onLoad(async function({ tabId, hostname }) {
+    onLoad(async function({ hostname, tabId, url }) {
         let then = Date.now();
 
         // Loop through all modules and check if the host or query check
@@ -116,7 +116,8 @@ async function main() {
         modules = (await Promise.all(modules)).filter(m => !!m);
 
         if (modules.length > 0) {
-            console.log(`${modules.length} module(s) will be loaded for this tab`);
+            const moduleSrc = JSON.stringify(modules.map(m => m.src));
+            console.log(`${modules.length} module(s) will be loaded for ${hostname}: ${moduleSrc}`);
             injectCss(tabId, modules);
             injectScripts(tabId, modules)
             console.log(`Injecting took ${Date.now() - then}ms`);
