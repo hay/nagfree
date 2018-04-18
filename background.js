@@ -87,6 +87,8 @@ async function loadModule(script) {
 }
 
 async function main() {
+    let then = Date.now();
+
     console.log('Loading modules');
     let scripts = await getScriptsInDirectory(SCRIPTS_PATH);
     scripts = scripts.map(async (script) => await loadModule(script));
@@ -94,11 +96,15 @@ async function main() {
 
     const allModules = await Promise.all(scripts);
 
+    console.log(`Loading took ${Date.now() - then}ms`);
+
     // Note how we use an old fashioned callback here for onLoad instead of
     // a promise, because the background.js runs all the time but needs to
     // execute this stuff every time we have a page reload, we can't use a
     // promise because they only execute *once*.
     onLoad(async function({ tabId, hostname }) {
+        let then = Date.now();
+
         // Loop through all modules and check if the host or query check
         // is valid for the current tab, after that filter that
         // to all the usable modules
@@ -111,6 +117,8 @@ async function main() {
 
         injectCss(tabId, modules);
         injectScripts(tabId, modules)
+
+        console.log(`Injecting took ${Date.now() - then}ms`);
     });
 }
 

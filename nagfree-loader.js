@@ -50,16 +50,21 @@ function runJs(js) {
     }
 }
 
-function loadModules() {
-    const scripts = JSON.parse(script.dataset.scripts);
+async function loadModules() {
+    let then = Date.now();
+    let scripts = JSON.parse(script.dataset.scripts);
 
-    scripts.forEach((src) => {
-        import(src).then((module) => {
-            if (module.default && module.default.js) {
-                runJs(module.default.js);
-            }
-        });
+    scripts = scripts.map(async (src) => {
+        const module = await import(src);
+
+        if (module.default && module.default.js) {
+            runJs(module.default.js);
+        }
     });
+
+    await Promise.all(scripts);
+
+    // console.log(`Running took ${Date.now() - then}ms`);
 }
 
 loadModules();
