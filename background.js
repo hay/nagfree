@@ -1,18 +1,4 @@
-const log = console.log.bind(console);
 const SCRIPTS_PATH = 'scripts';
-const modules = [];
-
-chrome.runtime.onMessage.addListener((req, sender, res) => {
-    console.log('message');
-    console.log(req);
-});
-
-chrome.runtime.onMessageExternal.addListener(
-  function(request, sender, sendResponse) {
-    console.log('ja ho');
-    console.log(request);
-  });
-
 
 function getHostname(url) {
     url = new URL(url);
@@ -20,10 +6,9 @@ function getHostname(url) {
 }
 
 // Yes, this is pretty much voodoo
-function injectScripts(tabId, scripts) {
-    console.log('Injecting loader');
+function injectScripts(tabId, modules) {
+    let scripts = modules.filter(m => !!m.module.js).map(m => m.module.src);
     scripts = JSON.stringify(scripts);
-    console.log(scripts);
 
     chrome.tabs.executeScript(tabId, {
         code : `
@@ -39,7 +24,7 @@ function injectScripts(tabId, scripts) {
 }
 
 function getScriptsInDirectory(directory) {
-    log('Loading scripts');
+    console.log('Loading scripts');
 
     return new Promise((resolve, reject) => {
         chrome.runtime.getPackageDirectoryEntry((entry) => {
@@ -55,79 +40,75 @@ function getScriptsInDirectory(directory) {
     });
 }
 
-function loadModules() {
-    log('Queing up modules');
-
-    chrome.webNavigation.onCompleted.addListener((details) => {
-        const modulesToLoad = [];
-        const { tabId, url } = details;
-        const hostname = getHostname(url);
-
-        const modulesPromises = modules.map((module) => {
-            return new Promise((resolve, reject) => {
-                if (module.host && module.host === hostname) {
-                    log(`Hostname found, executing module ${module.src}`);
-                    modulesToLoad.push({tabId, module});
-                }
-
-                if (module.query) {
-                    chrome.tabs.executeScript(tabId, {
-                        code : `!!document.querySelector('${module.query}');`
-                    }, (result) => {
-                        if (result[0]) {
-                            log(`Query '${module.query}' found, executing module ${module.src}`);
-                            modulesToLoad.push({tabId, module});
-                        }
-
-                        resolve();
-                    });
-                } else {
-                    resolve();
-                }
-            });
+function onLoad() {
+    return new Promise((resolve, reject) => {
+        chrome.webNavigation.onCompleted.addListener((details) => {
+            const { tabId, url } = details;
+            const hostname = getHostname(url);
+            resolve({ tabId, hostname });
         });
-
-        Promise.all(modulesPromises).then(() => {
-            // Just take the first tabId, we may want to customize this
-            // later, but haven't yet found a usecase for using different
-            // tabIds
-            const tabId = modulesToLoad[0].tabId;
-
-            // Make an array of all scripts of modules with a js function,
-            // we need to inject those
-            const scripts = modulesToLoad
-                .filter(m => !!m.module.js)
-                .map(m => m.module.src);
-
-            // Inject CSS
-            const css = modulesToLoad
-                .filter(m => !!m.module.css)
-                .map(m => m.module.css)
-                .join('\n');
-
-            // Inject styles
-            chrome.tabs.insertCSS(tabId, {
-                code : css
-            });
-
-            // Finally inject scripts
-            injectScripts(tabId, scripts);
-        });
-
     });
 }
 
-function main() {
-    getScriptsInDirectory(SCRIPTS_PATH).then((scripts) => {
-        scripts = scripts.map((script) => {
-            return import(script).then((module) => {
-                module.default.src = script;
-                modules.push(module.default)
-            });
-        });
+function moduleToCheckPromise({ tabId, hostname, module }) {
+    return new Promise((resolve, reject) => {
+        let passed = false;
 
-        Promise.all(scripts).then(loadModules);
+        if (module.host && module.host === hostname) {
+            console.log(`Hostname found, executing module ${module.src}`);
+            passed = true;
+        }
+
+        if (module.query) {
+            chrome.tabs.executeScript(tabId, {
+                code : `!!document.querySelector('${module.query}');`
+            }, (result) => {
+                if (result[0]) {
+                    console.log(`Query '${module.query}' found, executing module ${module.src}`);
+                    resolve({tabId, module});
+                } else {
+                    resolve(false);
+                }
+            });
+        } else {
+            if (passed) {
+                resolve({tabId, module});
+            } else {
+                resolve(false);
+            }
+        }
     });
+}
+
+function injectCss(tabId, modules) {
+    const css = modules.map(m => m.module.css ? m.module.css : '').join('\n');
+
+    chrome.tabs.insertCSS(tabId, {
+        code : css
+    });
+}
+
+async function loadModule(script) {
+    const module = await import(script);
+    module.default.src = script;
+    return module.default;
+}
+
+async function main() {
+    let scripts = await getScriptsInDirectory(SCRIPTS_PATH);
+    scripts = scripts.map(async (script) => await loadModule(script));
+
+    let modules = await Promise.all(scripts);
+    const { tabId, hostname } = await onLoad();
+    modules = modules.map(async (module) => {
+        return await moduleToCheckPromise({ tabId, hostname, module });
+    });
+
+    modules = await Promise.all(modules);
+    modules = modules.filter(m => !!m);
+
+    injectCss(tabId, modules);
+    injectScripts(tabId, modules)
 }
 
 main();
