@@ -40,44 +40,41 @@ function getScriptsInDirectory(directory) {
     });
 }
 
-function onLoad() {
-    return new Promise((resolve, reject) => {
-        chrome.webNavigation.onCompleted.addListener((details) => {
-            const { tabId, url } = details;
-            const hostname = getHostname(url);
-            resolve({ tabId, hostname });
-        });
+// Because this can happen multiple times, we can't make this a promise!
+function onLoad(resolve) {
+    chrome.webNavigation.onCompleted.addListener((details) => {
+        const { tabId, url } = details;
+        const hostname = getHostname(url);
+        resolve({ tabId, hostname });
     });
 }
 
-function moduleToCheckPromise({ tabId, hostname, module }) {
-    return new Promise((resolve, reject) => {
-        let passed = false;
+function checkModule({ tabId, hostname, module }, resolve) {
+    let passed = false;
 
-        if (module.host && module.host === hostname) {
-            console.log(`Hostname found, executing module ${module.src}`);
-            passed = true;
-        }
+    if (module.host && module.host === hostname) {
+        console.log(`Hostname found, executing module ${module.src}`);
+        passed = true;
+    }
 
-        if (module.query) {
-            chrome.tabs.executeScript(tabId, {
-                code : `!!document.querySelector('${module.query}');`
-            }, (result) => {
-                if (result[0]) {
-                    console.log(`Query '${module.query}' found, executing module ${module.src}`);
-                    resolve({tabId, module});
-                } else {
-                    resolve(false);
-                }
-            });
-        } else {
-            if (passed) {
+    if (module.query) {
+        chrome.tabs.executeScript(tabId, {
+            code : `!!document.querySelector('${module.query}');`
+        }, (result) => {
+            if (result[0]) {
+                console.log(`Query '${module.query}' found, executing module ${module.src}`);
                 resolve({tabId, module});
             } else {
                 resolve(false);
             }
+        });
+    } else {
+        if (passed) {
+            resolve({tabId, module});
+        } else {
+            resolve(false);
         }
-    });
+    }
 }
 
 function injectCss(tabId, modules) {
@@ -94,21 +91,47 @@ async function loadModule(script) {
     return module.default;
 }
 
+function mapCallbacks(chain, callback) {
+    let tries = chain.length;
+
+    for (let i = 0; i < chain.length; i++) {
+        const fn = chain[i];
+
+        fn((result) => {
+            chain[i] = result;
+            tries--;
+
+            if (tries === 0) {
+                callback(chain);
+            }
+        });
+    }
+}
+
 async function main() {
     let scripts = await getScriptsInDirectory(SCRIPTS_PATH);
     scripts = scripts.map(async (script) => await loadModule(script));
 
-    let modules = await Promise.all(scripts);
-    const { tabId, hostname } = await onLoad();
-    modules = modules.map(async (module) => {
-        return await moduleToCheckPromise({ tabId, hostname, module });
+    const allModules = await Promise.all(scripts);
+
+    // Note how we use old fashioned callbacks here instead of promises,
+    // because the background.js runs all the time but needs to execute this
+    // stuff every time we have a page reload, we can't use promises
+    // because they only execute *once*. Instead of that, we use some
+    // old school async stuff
+    onLoad(({ tabId, hostname }) => {
+        let modules = allModules.map((module) => {
+            return function(resolve) {
+                checkModule({ tabId, hostname, module }, resolve);
+            };
+        });
+
+        mapCallbacks(modules, (modules) => {
+            modules = modules.filter(m => !!m);
+            injectCss(tabId, modules);
+            injectScripts(tabId, modules)
+        });
     });
-
-    modules = await Promise.all(modules);
-    modules = modules.filter(m => !!m);
-
-    injectCss(tabId, modules);
-    injectScripts(tabId, modules)
 }
 
 main();
