@@ -1,7 +1,6 @@
 const log = console.log.bind(console);
 const SCRIPTS_PATH = 'scripts';
-const hosts = {};
-const queries = {};
+const modules = [];
 
 function getHostname(url) {
     url = new URL(url);
@@ -59,17 +58,6 @@ function executeModuleInTab(tabId, module) {
     }
 }
 
-function parseModule(module, src) {
-    // For easy reference later
-    module.src = src;
-
-    if (module.host) {
-        hosts[module.host] = module;
-    } else if (module.query) {
-        queries[module.query] = module;
-    }
-}
-
 function setupInjector() {
     log('Setting up injector');
 
@@ -77,29 +65,34 @@ function setupInjector() {
         const { tabId, url } = details;
         const hostname = getHostname(url);
 
-        if (hostname in hosts) {
-            log('Hostname found, executing module');
-            executeModuleInTab(tabId, hosts[hostname]);
-            return;
-        }
+        modules.forEach((module) => {
+            if (module.host && module.host === hostname) {
+                log('Hostname found, executing module');
+                executeModuleInTab(tabId, module);
+                return;
+            }
 
-        for (let query in queries) {
-            chrome.tabs.executeScript(tabId, {
-                code : `!!document.querySelector('${query}');`
-            }, (result) => {
-                if (result[0]) {
-                    log(`Query '${query}' found, executing module`);
-                    executeModuleInTab(tabId, queries[query])
-                }
-            });
-        }
+            if (module.query) {
+                chrome.tabs.executeScript(tabId, {
+                    code : `!!document.querySelector('${module.query}');`
+                }, (result) => {
+                    if (result[0]) {
+                        log(`Query '${module.query}' found, executing module`);
+                        executeModuleInTab(tabId, module)
+                    }
+                });
+            }
+        });
     });
 }
 
 function main() {
     getScriptsInDirectory(SCRIPTS_PATH).then((scripts) => {
         scripts = scripts.map((script) => {
-            return import(script).then(m => parseModule(m.default, script));
+            return import(script).then((module) => {
+                module.default.src = script;
+                modules.push(module.default)
+            });
         });
 
         Promise.all(scripts).then(setupInjector);
