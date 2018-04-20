@@ -14,6 +14,8 @@ export default {
         // Add Wikidata ID to title
         const itemId = mw.config.get('wgWikibaseItemId');
 
+        if (!itemId) return;
+
         $("#firstHeading").innerHTML += `
             <sup class="nf-wikibase-link">
                 <a href="https://www.wikidata.org/wiki/Special:EntityPage/${itemId}">
