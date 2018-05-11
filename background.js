@@ -1,8 +1,8 @@
 const SCRIPTS_PATH = 'scripts';
 
-function getHostname(url) {
-    url = new URL(url);
-    return url.hostname.replace('www.', '');
+function matchesHostname(host, match) {
+    const index = host.indexOf(match);
+    return index === -1 ? false : host.slice(index) === match;
 }
 
 // Promisified wrapper
@@ -72,7 +72,7 @@ function getScriptsInDirectory(directory) {
 function onLoad(resolve) {
     chrome.webNavigation.onCompleted.addListener((details) => {
         const { tabId, url } = details;
-        const hostname = getHostname(url);
+        const hostname = new URL(url).hostname;
         resolve({ hostname, tabId, url });
     });
 }
@@ -82,7 +82,9 @@ async function checkModule({ tabId, hostname, module }) {
         console.log(`${module.src} has no host or query check!`);
     }
 
-    if (module.host && module.host === hostname) {
+    // Check if the module has a hostname, and if the hostname is part of the
+    // end of the tab's hostname
+    if (module.host && matchesHostname(hostname, module.host)) {
         return module;
     }
 
@@ -126,6 +128,7 @@ async function main() {
         let modules = allModules.map(async function(module) {
             return await checkModule({ tabId, hostname, module });
         });
+
         modules = (await Promise.all(modules)).filter(m => !!m);
 
         if (modules.length > 0) {
