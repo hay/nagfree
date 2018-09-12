@@ -14,33 +14,46 @@ export default {
             height: 30px;
             margin-left: 30px;
         }
+
+        .ui-alluser-layer-dialog,
+        .ui-mask {
+            display: none !important;
+        }
     `,
 
     js() {
-        $("#view-filter").appendChild(ratingInput);
+        function addMinimalRatings() {
+            const $viewFilter = $("#view-filter");
 
-        $("#minimalratings-go").addEventListener('click', () => {
-            let minimalratings = parseInt($("#minimalratings").value);
+            if (!$viewFilter) return;
 
-            if (!minimalratings) {
-                let minimalratings = 0;
-            }
+            $viewFilter.appendChild(ratingInput);
 
-            $$(".list-item").forEach((item) => {
-                let ratings = item.querySelector('.rate-num');
+            $("#minimalratings-go").addEventListener('click', () => {
+                let minimalratings = parseInt($("#minimalratings").value);
 
-                if (!ratings) {
-                    return;
+                if (!minimalratings) {
+                    let minimalratings = 0;
                 }
 
-                ratings = ratings.innerText.match(/\d+/);
+                $$(".list-item").forEach((item) => {
+                    let ratings = item.querySelector('.rate-num');
 
-                if (ratings.length && ratings[0] < minimalratings) {
-                    item.style.opacity = 0.1;
-                } else {
-                    item.style.opacity = 1;
-                }
+                    if (!ratings) {
+                        return;
+                    }
+
+                    ratings = ratings.innerText.match(/\d+/);
+
+                    if (ratings.length && ratings[0] < minimalratings) {
+                        item.style.opacity = 0.1;
+                    } else {
+                        item.style.opacity = 1;
+                    }
+                });
             });
-        });
+        }
+
+        addMinimalRatings();
     }
 }
