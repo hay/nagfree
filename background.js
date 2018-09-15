@@ -60,7 +60,12 @@ function getScriptsInDirectory(directory) {
                 const reader = dir.createReader();
 
                 reader.readEntries((results) => {
+                    // Only get stuff that ends in '.js'
+                    results = results.filter(entry => entry.name.slice(-3) === '.js');
+
+                    // And transform to a proper path
                     results = results.map(entry => `./${directory}/${entry.name}`);
+
                     resolve(results);
                 });
             });
