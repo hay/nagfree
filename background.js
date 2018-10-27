@@ -105,7 +105,7 @@ async function checkModule({ tabId, hostname, module }) {
 async function loadModule(script) {
     const module = await import(script);
     module.default.src = script;
-    return module.default;
+    return module.default.disabled ? false : module.default;
 }
 
 async function main() {
@@ -114,9 +114,17 @@ async function main() {
     console.log('Loading modules');
     let scripts = await getScriptsInDirectory(SCRIPTS_PATH);
     scripts = scripts.map(async (script) => await loadModule(script));
-    console.log(`${scripts.length} modules available`);
+    let availableModules = scripts.length;
+    console.log(`${availableModules} modules available`);
 
-    const allModules = await Promise.all(scripts);
+    let allModules = await Promise.all(scripts);
+
+    // Remove modules that have a disabled flag
+    allModules = allModules.filter(m => !!m);
+
+    if (allModules.length !== availableModules) {
+        console.log(`${availableModules - allModules.length} modules disabled`);
+    }
 
     console.log(`Loading took ${Date.now() - then}ms`);
 
