@@ -37,6 +37,10 @@ export default {
         .smaller-low-av-msg_wrapper,
         .soldout_property,
         .gs-discount-tag,
+        .sr_hotel_expectation__wrapper,
+        .genius_badge--by-stars,
+        .scarcity_color,
+        .sr-booked-x-times,
         .strike-it-red_anim,
         .review-score-widget__text,
         .sr__guest-favorite {
