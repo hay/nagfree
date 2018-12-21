@@ -6,7 +6,7 @@ export default {
             display: none !important;
         }
 
-        body.issues #issue-holder {
+        body.issues #issue {
             display: flex;
             justify-content: center;
         }

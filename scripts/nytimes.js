@@ -13,7 +13,9 @@ export default {
     },
 
     css : `
-        .adblock_sub {
+        .adblock_sub,
+        .gdpr,
+        .meter_default {
             display: none !important;
         }
     `
