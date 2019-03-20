@@ -16,5 +16,9 @@ export default {
         .adblock_sub {
             display: none !important;
         }
+
+        #ribbon {
+            display: none;
+        }
     `
 }
