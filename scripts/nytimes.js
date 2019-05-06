@@ -13,10 +13,6 @@ export default {
     },
 
     css : `
-        .adblock_sub {
-            display: none !important;
-        }
-
         #ribbon {
             display: none;
         }
