@@ -14,11 +14,6 @@ export default {
             height: 30px;
             margin-left: 30px;
         }
-
-        .ui-alluser-layer-dialog,
-        .ui-mask {
-            display: none !important;
-        }
     `,
 
     js() {
