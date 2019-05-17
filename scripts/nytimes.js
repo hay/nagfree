@@ -18,5 +18,9 @@ export default {
         .meter_default {
             display: none !important;
         }
+
+	#ribbon {
+            display: none;
+        }
     `
 }
