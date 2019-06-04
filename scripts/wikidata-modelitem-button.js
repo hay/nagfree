@@ -4,6 +4,10 @@ export default {
     disabled : true,
 
     js() {
+        const $ = window.jQuery;
+        const mw = window.mediaWiki;
+        const USER_LANGUAGE = mw.config.get('wgUserLanguage');
+
         function getQueryModelItems(qid, language = 'en') {
             return `
                 select ?item ?itemLabel ?itemDescription where {
@@ -34,9 +38,6 @@ export default {
             const data = await req.json();
             return data.results.bindings;
         }
-
-        const $ = window.jQuery;
-        const USER_LANGUAGE = mw.config.get('wgUserLanguage');
 
         function addButtons($el) {
             $el.find(".wikibase-statementview").each((index, el) => {
@@ -78,7 +79,7 @@ export default {
             let results = await query(getQueryModelItems(qid));
 
             if (results.length) {
-                displayModelItems(el, '${results.length} model items found:', results);
+                displayModelItems(el, `${results.length} model items found:`, results);
             } else {
                 el.innerHTML = 'No model items found. Fetching likely candidates...';
                 results = await query(getQueryPopularItems(qid));
@@ -96,12 +97,10 @@ export default {
             const $el = $('[data-property-id="P31"]');
 
             if ($el.length) {
-                setTimeout(() => {
-                    addButtons($el);
-                }, 1000);
+                addButtons($el);
             }
         }
 
-        main();
+        mw.hook('wikibase.entityPage.entityView.rendered').add(main);
     }
 };
