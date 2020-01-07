@@ -1,4 +1,4 @@
-import { $, $$ } from '../utils.js';
+import { $, $$, waitForSelector } from '../utils.js';
 
 const ratingInput = document.createElement('div');
 ratingInput.innerHTML = `
@@ -49,6 +49,28 @@ export default {
             });
         }
 
+        function addPricesWithShipping() {
+            function nr(str) {
+                return Number(str.match(/\d|,|\./g).join('').replace(',', '.'));
+            }
+
+            $$('.product-card').forEach((card) => {
+                let price = card.querySelector('.price-current').textContent;
+                let shipping = card.querySelector('.shipping-value').textContent;
+                let total = (nr(price) + nr(shipping)).toFixed(2);
+                let label = `<span> (total: €${total})</span>`;
+                let el = card.querySelector('.item-price-row');
+
+                if (el) {
+                    el.innerHTML += label;
+                }
+            });
+        }
+
         addMinimalRatings();
+
+        waitForSelector('.product-card', 1000).then(() => {
+            addPricesWithShipping();
+        });
     }
 }

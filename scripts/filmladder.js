@@ -1,6 +1,8 @@
 import { $, $$ } from '../utils.js';
 
 export default {
+    disabled : true,
+
     host : 'filmladder.nl',
 
     css : `

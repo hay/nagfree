@@ -15,12 +15,11 @@ export default {
     css : `
         .adblock_sub,
         .gdpr,
+        .recipe-page #appContainer,
+        #ribbon,
+        .expanded-dock,
         .meter_default {
             display: none !important;
-        }
-
-	#ribbon {
-            display: none;
         }
     `
 }
