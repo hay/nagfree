@@ -27,7 +27,7 @@ async function main() {
     for (let path of scripts) {
         const basename = pathlib.basename(path, pathlib.extname(path));
         const description = await getDescriptionFromPath(path);
-        descriptions.push(`* ${basename} - ${description}`);
+        descriptions.push(`* \`${basename}\` - ${description}`);
     }
 
     descriptions = descriptions.join('\n');
