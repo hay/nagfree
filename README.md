@@ -4,7 +4,7 @@ A Chrome extension that makes a few sites a little better
 NagFree is a Chrome extension that takes away the usability problems some sites have. Flickr and Instagram, for example, don't allow you to right-click on photographs to save them. This extension fixes that. The search results page on Wikimedia Commons is pretty awful, so this extension fixes that.
 
 ## Installing
-1. Either [download this extension](https://github.com/hay/nagfree/releases/latest/download/package.zip) and unzip the file or use `git clone` to clone the repo.
+1. Either [download this extension](https://github.com/hay/nagfree/archive/v0.2.zip) and unzip the file or use `git clone` to clone the repo.
 2. Go to your Chrome extensions.
 3. Enable 'Developer mode' (switch on the right).
 4. Click the 'Load unpacked' button on the top left and select the directory.
