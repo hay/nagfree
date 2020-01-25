@@ -1,3 +1,5 @@
+// @description Add price per kilogram to product listings on ah.nl
+
 const PRODUCT_LANE_SELECTOR = '.product-lane .product-cardview .product-price';
 const PAGE_SELECTOR = '.canvas-page';
 

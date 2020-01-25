@@ -1,3 +1,5 @@
+// @description Remove the ugly giftwrap thing
+
 export default {
     host : 'pinterest.com',
 

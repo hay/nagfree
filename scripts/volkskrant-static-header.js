@@ -1,4 +1,5 @@
-// Make fixed header not fixed
+// @description Make fixed header not fixed
+
 export default {
     host : 'volkskrant.nl',
 

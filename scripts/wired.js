@@ -1,3 +1,5 @@
+// @description Remove paywall / anti adblock thing
+
 export default {
     host : 'wired.com',
 

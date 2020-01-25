@@ -1,3 +1,5 @@
+// @description Remove useless right column
+
 export default {
     host : 'facebook.com',
 

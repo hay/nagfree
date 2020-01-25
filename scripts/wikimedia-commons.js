@@ -1,3 +1,5 @@
+// @description Add a better search results page to Wikimedia Commons
+
 import { $, $$, elementFromHtml } from '../utils.js';
 
 const style = `

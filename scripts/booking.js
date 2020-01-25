@@ -1,4 +1,5 @@
-// Remove silly stress inducing UX from booking.com
+// @description Remove silly stress inducing UX from booking.com
+
 // See < https://thenextweb.com/contributors/2017/09/21/booking-com-uses-stress-rush-decisions >
 export default {
     host : 'booking.com',

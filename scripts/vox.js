@@ -1,3 +1,5 @@
+// @description Remove the tab bar
+
 export default {
     host : 'vox.com',
     css : `

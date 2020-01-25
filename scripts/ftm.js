@@ -1,3 +1,5 @@
+// @description Remove paywall
+
 export default {
     host : 'ftm.nl',
 

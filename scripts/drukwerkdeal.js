@@ -1,3 +1,5 @@
+// @description Add price per piece
+
 import { $, $$, waitFor } from '../utils.js';
 
 function addPricePerPiece() {

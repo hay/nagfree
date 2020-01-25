@@ -1,3 +1,5 @@
+// @description Remove fixed header
+
 export default {
     host : 'eyefilm.nl',
 

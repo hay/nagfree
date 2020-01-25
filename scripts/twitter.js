@@ -1,4 +1,5 @@
-// Hide retweets, 'liked by', promoted tweets and other crap
+// @description Hide retweets, 'liked by', promoted tweets and other crap
+
 import { $, $$, Storage } from '../utils.js';
 import Vue from '../node_modules/vue/dist/vue.esm.browser.js';
 

@@ -1,3 +1,5 @@
+// @description Get bigger thumbnails
+
 import { $ } from '../utils.js';
 
 export default {

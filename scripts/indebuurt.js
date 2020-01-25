@@ -1,4 +1,4 @@
-// Remove those stupid arrows floating over the text
+// @description Remove those stupid arrows floating over the text
 export default {
     host : 'indebuurt.nl',
 

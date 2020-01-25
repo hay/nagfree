@@ -1,3 +1,5 @@
+// @description Add a 'sort by favorites' option to questions
+
 import { $, $$ } from '../utils.js';
 
 export default {

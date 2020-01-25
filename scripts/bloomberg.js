@@ -1,3 +1,5 @@
+// @description Remove paywall banner
+
 export default {
     host : 'bloomberg.com',
     css : `

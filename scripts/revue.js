@@ -1,3 +1,5 @@
+// @description Remove sources holder
+
 export default {
     host : 'getrevue.co',
 

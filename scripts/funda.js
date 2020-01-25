@@ -1,3 +1,5 @@
+// @description Add price per square meter
+
 import { $, $$, elementFromHtml } from '../utils.js';
 
 const $page = $(".object-detail");

@@ -1,3 +1,5 @@
+// @description Add a link to pageviews to every Wikipedia article
+
 import { $ } from '../utils.js';
 
 function getPageviewLink() {

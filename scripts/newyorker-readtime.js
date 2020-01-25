@@ -1,3 +1,5 @@
+// @description Add reading time / wordcount
+
 import { $, countWords, elementFromHtml, numberWithCommas } from '../utils.js';
 
 const article = $("#articleBody");

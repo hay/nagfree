@@ -1,4 +1,4 @@
-// Remove anti-adblocker messages
+// @description Remove anti-adblocker messages
 import { $$ } from '../utils.js';
 
 export default {

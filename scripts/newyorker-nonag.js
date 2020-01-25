@@ -1,3 +1,5 @@
+// @description No nagscreen
+
 export default {
     host : 'newyorker.com',
 

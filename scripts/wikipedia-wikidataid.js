@@ -1,3 +1,5 @@
+// @description Add Wikidata ID to all Wikipedia articles
+
 import { $ } from '../utils.js';
 
 export default {

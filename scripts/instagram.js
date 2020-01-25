@@ -1,3 +1,5 @@
+// @description Allow right-clicking on and saving images
+
 import { $$, waitFor } from '../utils.js';
 
 export default {

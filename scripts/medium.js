@@ -1,4 +1,4 @@
-// Remove nonsense
+// @description Remove nonsense
 export default {
     query : 'meta[name="twitter:app:name:iphone"][content="Medium"]',
 

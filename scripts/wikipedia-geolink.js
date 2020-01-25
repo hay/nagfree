@@ -1,5 +1,4 @@
-// Directly link the coordinates in articles to Google Maps instead of the
-// geohack tool
+// @description Directly link the coordinates in articles to Google Maps instead of the geohack tool
 import { $ } from '../utils.js';
 
 export default {

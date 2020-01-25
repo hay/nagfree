@@ -1,3 +1,5 @@
+// @description Remove cruft and useless ads
+
 import { $, $$ } from '../utils.js';
 
 export default {

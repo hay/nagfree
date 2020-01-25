@@ -1,3 +1,5 @@
+// @description Add an option to filter by a minimum amount of ratings
+
 import { $, $$, waitForSelector } from '../utils.js';
 
 const ratingInput = document.createElement('div');

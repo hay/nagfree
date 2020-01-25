@@ -1,3 +1,5 @@
+// @description Add option to see times with movie listings
+
 import { $, $$ } from '../utils.js';
 
 export default {

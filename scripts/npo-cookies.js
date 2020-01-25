@@ -1,8 +1,9 @@
+// @description Automatically deny all tracking and social media NPO cookies
+
 const DENY_COOKIES = ['social', 'advertising'];
 
 import { $$ } from '../utils.js';
 
-// Automatically deny all tracking and social media NPO cookies
 export default {
     query : '#ccm_notification_wrapper',
 
