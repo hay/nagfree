@@ -1,7 +1,7 @@
 ![Nagfree logo](logo.png)
-A Chrome extension that makes a few sites a little better
+> A Chrome extension that makes a few sites a little better
 
-NagFree is a Chrome extension that takes away the usability problems some sites have. Flickr and Instagram, for example, don't allow you to right-click on photographs to save them. This extension fixes that. The search results page on Wikimedia Commons is pretty awful, so this extension fixes that.
+Nagfree is a Chrome extension that allows you to write scripts that fix the usability of some sites. For example, it allows you to right-click on images on Instagram, add reading times to the New Yorker, and add larger thumbnails to the search results page on Wikimedia Commons.
 
 ## Installing
 1. Either [download this extension](https://github.com/hay/nagfree/archive/v0.2.zip) and unzip the file or use `git clone` to clone the repo.
@@ -48,3 +48,12 @@ NagFree is a Chrome extension that takes away the usability problems some sites 
 * `wikipedia-pageviews` - Add a link to pageviews to every Wikipedia article
 * `wikipedia-wikidataid` - Add Wikidata ID to all Wikipedia articles
 * `wired` - Remove paywall / anti adblock thing
+
+## Writing your own scripts
+Support for adding and removing scripts is a bit clumsy at the moment. I would suggest cloning this repo and just adding your own scripts to the `scripts/` folder.
+
+## License
+Licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Credits
+Written by [Hay Kranen](https://www.haykranen.nl).

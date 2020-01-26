@@ -2,6 +2,7 @@
 
 export default {
     host : 'whitehouse.gov',
+
     css : `
         * {
             font-family: 'Comic Sans MS' !important;
