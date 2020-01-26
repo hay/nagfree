@@ -1,10 +1,10 @@
-![Nagfree logo](logo.png)
+![Nagfree logo](docs/logo.png)
 > A Chrome extension that makes a few sites a little better
 
 Nagfree is a Chrome extension that allows you to write scripts that fix the usability of some sites. For example, it allows you to right-click on images on Instagram, add reading times to the New Yorker, and add larger thumbnails to the search results page on Wikimedia Commons.
 
 ## Installing
-1. Either [download this extension](https://github.com/hay/nagfree/archive/v0.2.zip) and unzip the file or use `git clone` to clone the repo.
+1. Either [download this extension](https://github.com/hay/nagfree/archive/master.zip) and unzip the file or use `git clone` to clone the repo.
 2. Go to your Chrome extensions.
 3. Enable 'Developer mode' (switch on the right).
 4. Click the 'Load unpacked' button on the top left and select the directory.

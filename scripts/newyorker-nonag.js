@@ -4,8 +4,9 @@ export default {
     host : 'newyorker.com',
 
     css : `
-        [data-cm-unit] {
-            display: none;
+        [data-cm-unit],
+        .paywall-bar {
+            display: none !important;
         }
     `
 }
