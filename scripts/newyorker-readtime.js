@@ -2,7 +2,7 @@
 
 import { $, countWords, elementFromHtml, numberWithCommas } from '../utils.js';
 
-const article = $('[pattern="article-body"]');
+const article = $('[data-attribute-verso-pattern="article-body"]');
 const author = $('[itemprop="author"]');
 const WORDS_PER_MINUTE = 350;
 
